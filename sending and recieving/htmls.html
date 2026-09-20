@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Grade Analyzer</title>
+</head>
+<body>
+    <h2>Student Grade Analyzer</h2>
+    <input type="number" id="scoreInput" placeholder="Enter score">
+    <button onclick="sendDataToServer()">Analyze</button>
+    <p id="output"></p>
+
+    <script>
+        async function sendDataToServer() {
+            const scoreValue = document.getElementById("scoreInput").value;
+            const output = document.getElementById("output");
+
+            if (scoreValue === "") {
+                output.innerText = "Please enter a score.";
+                return;
+            }
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/analyze-grade", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ score: parseInt(scoreValue, 10) })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                output.innerText = `${data.message} -> Result: ${data.status}`;
+            } catch (error) {
+                output.innerText = `Unable to connect to the server: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
